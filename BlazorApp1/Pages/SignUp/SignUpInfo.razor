@@ -1,0 +1,33 @@
+﻿@page "/signup"
+@using BlazorApp1.Data
+@inject ICustomerService CustomerService
+@inject NavigationManager nav
+@inject IJSRuntime js
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+
+<h3>Signup</h3>
+<CustomerForm OnValidSubmit="@CustomerInsert" ButtonText="Next" cust="cust" passwordType="password"/>
+
+@code {
+    Customer cust = new Customer();
+
+    protected async Task CustomerInsert()
+    {
+        int id = await CustomerService.CustomerInsert(cust);
+        sessionStorage.SetItemAsync("customer", id);
+        if(id == 0)
+        {
+            await js.InvokeVoidAsync("alert", $"Fail");
+        }
+        else
+        {
+            await js.InvokeVoidAsync("alert", $"Account Created!");
+            nav.NavigateTo("/signupcreditcard");
+        }
+    }
+
+    void navigatetoLogin()
+    {
+        nav.NavigateTo("/login");
+    }
+}

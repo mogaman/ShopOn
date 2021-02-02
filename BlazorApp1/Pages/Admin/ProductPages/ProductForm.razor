@@ -1,0 +1,21 @@
+﻿ @using BlazorApp1.Data
+
+<EditForm Model="@p" OnValidSubmit="@OnValidSubmit">
+    <table>
+        <tr>Name: <input type="text" @bind="@p.productName" /></tr>
+
+        <tr>Description: <textarea type="text" style="width: 390px; height: 90px" @bind="@p.productDescription" /></tr>
+
+        <tr>Price: $<input type="number" @bind="@p.productPrice" /></tr>
+
+        <tr>Quantity: <input type="number" @bind="@p.productQuantity" /></tr>
+    </table>
+
+    <input type="submit" class="btn btn-success" value="@ButtonText" />
+</EditForm>
+
+@code {
+    [Parameter] public Product p { get; set; }
+    [Parameter] public EventCallback OnValidSubmit { get; set; }
+    [Parameter] public string ButtonText { get; set; }
+}

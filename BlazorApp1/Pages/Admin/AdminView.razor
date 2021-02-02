@@ -1,0 +1,115 @@
+﻿@page "/admin"
+@using BlazorApp1.Data
+@using BlazorApp1.Data.CreditCard 
+@inject IJSRuntime js
+@inject ICustomerService customerService
+@inject IProductService productService
+@inject NavigationManager nav
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+  
+<h3>Admin Page</h3>
+
+<h4>Customer Details</h4>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Password</th>
+            <th></th>
+        </tr>
+    </thead>
+    
+    <tbody>
+        @foreach (Customer c in custList)
+        {
+            <tr>
+                <td>@c.userID</td>
+                <td>@c.userName</td>
+                <td>@c.userEmail</td>
+                <td>@c.userPassword</td>
+                <td>
+                    <a class="btn btn-success" @onclick="() => editCustomer(c)">Edit</a>
+                    <button class="btn btn-danger" @onclick="() => deleteCustomer(c.userID)">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<p/>
+
+<h4>Products</h4>
+<a class ="btn btn-success" href="admin/createproduct"><i class="oi oi-plus"></i>Create Product</a>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th></th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach(Product p in prodList)
+        {
+            <tr>
+                <td>@p.productID</td>
+                <td>@p.productName</td>
+                <td>@p.productDescription</td>
+                <td>@p.productPrice</td>
+                <td>@p.productQuantity</td>
+                <td>
+                    <a class="btn btn-success" @onclick="() => editProduct(p)">Edit</a>
+                    <button class="btn btn-danger" @onclick="() => deleteProduct(p.productID)">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@code {
+    List<Customer> custList = new List<Customer>();
+    List<Product> prodList = new List<Product>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        custList = await customerService.CustomerGet();
+        prodList = await productService.ProductList();
+    }
+
+    //Method to redirect to edit Product Page
+    protected async Task editProduct(Product p)
+    {
+        await sessionStorage.SetItemAsync("passProdEdit", p);
+        nav.NavigateTo("/admin/editproduct");
+    }
+
+    //Method to redirect to edit Customer Page
+    protected async Task editCustomer(Customer c)
+    {
+        await sessionStorage.SetItemAsync("passCustEdit", c);
+        nav.NavigateTo("/admin/editcustomer");
+    }
+
+    //Method to delete product using method in ProductService.cs
+    protected async Task deleteProduct(int id)
+    {
+        js.InvokeVoidAsync("alert", $"Are you sure?");
+        await productService.DeleteProduct(id);
+        nav.NavigateTo(nav.Uri, forceLoad: true);
+    }
+
+    //Method to delete customer using method in CustomerService.cs
+    protected async Task deleteCustomer(int id)
+    {
+        js.InvokeVoidAsync("alert", $"Are you sure?");
+        await customerService.DeleteCustomer(id);
+        nav.NavigateTo(nav.Uri, forceLoad: true);
+    }
+}

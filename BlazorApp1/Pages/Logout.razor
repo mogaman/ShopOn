@@ -1,0 +1,16 @@
+﻿@page "/logout"
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject NavigationManager nav 
+    <center>
+        <h3>Successfully Logged Out!</h3>
+        <a href="#">Back to Home</a>
+    </center>
+
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await sessionStorage.SetItemAsync("user", 0);
+
+    }
+}

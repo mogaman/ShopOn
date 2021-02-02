@@ -1,0 +1,92 @@
+﻿@page "/shop"
+@using BlazorApp1.Data
+@using Microsoft.EntityFrameworkCore
+@inject IProductService productService
+@inject NavigationManager nav
+@inject IJSRuntime js
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+
+<h3>Shop</h3>
+<input type="input" placeholder="Search..." @bind="@value"><button type="submit" @onclick="searchProduct"><i class="oi oi-magnifying-glass"></i></button>@*<a class="btn btn-primary m-1">Search</a>*@
+@if (prod == null)
+{
+    <text>Loading, Please Wait...</text>
+}
+else if (prod.Count() == 0)
+{
+    <text>There are no Products available</text>
+}
+else
+{
+    if (id > 0)
+    {
+        <div class="card-deck">
+            @foreach (Product p in prod)
+            {
+                <div class="card m-3" style="min-width: 18rem; max-width:30.5%;">
+                    <div class="card-header">
+                        <h3>@p.productName</h3>
+                    </div>
+                    <div class="card-footer text-center">
+                        <p />
+                        <a>@p.productDescription</a>
+                        <p />
+                        <a>$@p.productPrice</a>
+                        <p />
+                        <a class="btn btn-primary m-1" @onclick="() => confirmPurchase(p.productID)">Buy Now</a>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="card-deck">
+            @foreach (Product p in prod)
+            {
+                <div class="card m-3" style="min-width: 18rem; max-width:30.5%;">
+                    <div class="card-header">
+                        <h3>@p.productName</h3>
+                    </div>
+                    <div class="card-footer text-center">
+                        <p />
+                        <a>@p.productDescription</a>
+                        <p />
+                        <a>$@p.productPrice</a>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+
+}
+
+@code {
+    List<Product> prod = new List<Product>();
+    int id;
+    string value;
+    protected override async Task OnInitializedAsync()
+    {
+        id = await sessionStorage.GetItemAsync<int>("user");
+        prod = await productService.PublicProductList();
+    }
+
+    //Method to search for Product
+    protected async Task searchProduct()
+    {
+        id = await sessionStorage.GetItemAsync<int>("user");
+        prod = await productService.SearchProduct(value);
+    }
+
+    //Method to confirm purchase
+    protected async Task confirmPurchase(int id)
+    {
+        bool confirmPurchase = await js.InvokeAsync<bool>("confirm", "Confirm Purchase?");
+        if(confirmPurchase == true)
+        {
+            nav.NavigateTo("/choosecard");
+            sessionStorage.SetItemAsync<int>("itemSelected", id);
+        }
+    }
+}

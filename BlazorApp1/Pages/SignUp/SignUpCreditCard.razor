@@ -1,0 +1,65 @@
+﻿@page "/signupcreditcard"
+@using BlazorApp1.Data.CreditCard
+@using Microsoft.EntityFrameworkCore
+@inject ICreditCardService CardService
+@inject NavigationManager nav
+@inject IJSRuntime js
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+
+<h3>Credit Card Info</h3>
+<EditForm Model="@card" OnValidSubmit="@CardInsert">
+    <table>
+        <tr>
+            <td>Card Number:</td>
+            <td>
+                <input type="number" @bind="card.cardNumber" required />
+            </td>
+        </tr>
+        <tr>
+            <td>Name on Card:</td>
+            <td>
+                <input type="text" @bind="card.cardName" required />
+            </td>
+        </tr>
+        <tr>
+            <td>Expiration Date:</td>
+            <td>
+                <input type="number" @bind="card.cardExpireMonth" min="1" max="12" placeholder="Month" required />
+            </td>
+            /
+            <td>
+                <input type="number" @bind="card.cardExpireYear" min="1" max="31" placeholder="Year" required />
+            </td>
+        </tr>
+        <tr>
+            <td>Security Code:</td>
+            <td>
+                <input type="number" @bind="card.cardCVV" required />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" style="text-align:center">
+                <input type="submit" value="Register" />
+            </td>
+        </tr>
+    </table>
+</EditForm>
+
+@code {
+    CreditCard card = new CreditCard();
+    //int id;
+
+    ////Method gets stored customerID 
+    //protected override async Task OnInitializedAsync()
+    //{
+    //    id = await sessionStorage.GetItemAsync<int>("customer");
+    //}
+
+    protected async Task CardInsert()
+    {
+        card.userID = await sessionStorage.GetItemAsync<int>("customer");
+        await CardService.CardInsert(card);
+        await js.InvokeVoidAsync("alert", $"Credit Card Added!");
+        nav.NavigateTo("/login");
+    }
+}

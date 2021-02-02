@@ -1,0 +1,35 @@
+﻿@using BlazorApp1.Data
+
+<EditForm Model="@cust" OnValidSubmit="@OnValidSubmit">
+    <table>
+        <tr>
+            <td>Name: </td>
+            <td>
+                <input type="text" @bind="cust.userName" required />
+            </td>
+        </tr>
+        <tr>
+            <td>Email:</td>
+            <td>
+                <input type="text" @bind="cust.userEmail" required />
+            </td>
+        </tr>
+        <tr>
+            <td>Password:</td>
+            <td>
+                <input type="@passwordType" @bind="cust.userPassword" required />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" style="text-align:center">
+                <input type="submit" value="@ButtonText" />
+            </td>
+        </tr>
+    </table>
+</EditForm>
+@code {
+    [Parameter] public Customer cust { get; set; }
+    [Parameter] public EventCallback OnValidSubmit { get; set; }
+    [Parameter] public string ButtonText { get; set; }
+    [Parameter] public string passwordType { get; set; }
+}

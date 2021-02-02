@@ -1,0 +1,25 @@
+﻿@page "/admin/editcustomer"
+@using BlazorApp1.Data
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject ICustomerService customerService
+@inject NavigationManager nav
+@inject IJSRuntime js
+  
+<h3>EditCustomer</h3>
+<CustomerForm OnValidSubmit="EditedCustomer" ButtonText="Edit" cust="cust" passwordType="text"/>
+
+@code {
+    Customer cust = new Customer();
+
+    protected override async Task OnInitializedAsync()
+    {
+        cust = await sessionStorage.GetItemAsync<Customer>("passCustEdit");
+    }
+
+    protected async Task EditedCustomer()
+    {
+        await customerService.EditCustomer(cust);
+        js.InvokeVoidAsync("alert", "Customer Edited!");
+        nav.NavigateTo("/admin");
+    }
+}

@@ -1,0 +1,52 @@
+﻿@page "/login"
+@using BlazorApp1.Data
+@using Microsoft.EntityFrameworkCore
+@inject ICustomerService customerService
+@inject NavigationManager nav
+@inject IJSRuntime js
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+
+<center>
+    <h3>Login</h3>
+    <EditForm Model="@cust" OnValidSubmit="@customerCheck">
+        <div class="container">
+            <label><b>Email</b></label><p />
+            <input type="text" @bind="cust.userEmail" required />
+            <p />
+            <label><b>Password</b></label><p /> 
+            <input type="password" @bind="cust.userPassword" required />
+            <p />
+
+            <button type="submit" class="btn btn-success">Submit </button>
+            <p />
+            Don't have an account? Register <a href="/signup">here</a>
+        </div>
+    </EditForm>
+</center>
+
+@code {
+    Customer cust = new Customer();
+    //Method to check user information using CustomerLogin method in CustomerService.cs
+    protected async Task customerCheck()
+    {
+        if(cust.userEmail == "admin" && cust.userPassword == "admin")
+        {
+            nav.NavigateTo("/admin");
+        }
+
+        else
+        {
+            Customer reply = await customerService.CustomerLogin(cust.userEmail, cust.userPassword);
+            //reply obtained from method CustomerLogin in CustomerService.cs
+            if (reply.userID != 0)
+            {
+                sessionStorage.SetItemAsync("user", reply.userID);
+                nav.NavigateTo("/shop");
+            }
+            else
+            {
+                js.InvokeVoidAsync("alert", $"Wrong Email/Password");
+            }
+        }
+    }
+}

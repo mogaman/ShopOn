@@ -1,0 +1,19 @@
+﻿@page "/admin/createproduct"
+@using BlazorApp1.Data
+@inject IProductService productService
+@inject NavigationManager nav
+@inject IJSRuntime js 
+
+<h3>Add Product</h3>
+<ProductForm OnValidSubmit="@AddedProduct" p="p" ButtonText="Create" />
+
+@code {
+    Product p = new Product();
+
+    protected async Task AddedProduct()
+    {
+        await productService.AddProduct(p);
+        js.InvokeVoidAsync("alert", "Product Created!");
+        nav.NavigateTo("/admin");
+    }
+}

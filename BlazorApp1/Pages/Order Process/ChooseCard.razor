@@ -1,0 +1,70 @@
+﻿@page "/choosecard"
+@using BlazorApp1.Data
+@using BlazorApp1.Data.CreditCard
+@using BlazorApp1.Data.Order
+@inject ICreditCardService cardService
+@inject IProductService productService
+@inject IOrderService orderService
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject NavigationManager nav
+@inject IJSRuntime js
+
+<h3>Order Confirmation</h3>
+<div class="card-deck">
+    @if (cards != null)
+    {
+        @foreach (CreditCard c in cards)
+        {
+            <div class="card m-3" style="min-width: 18rem; max-width:30.5%;">
+                <div class="card-header">
+                    <h3>@c.cardNumber</h3>
+                </div>
+                <div class="card-footer text-center">
+                    <p />
+                    <a>@c.cardName</a>
+                    <p />
+                    <a>@c.cardExpireMonth</a>/<a>@c.cardExpireYear &emsp; @c.cardCVV</a>
+                    <p />
+                    <a class="btn btn-primary m-1" @onclick="() => cardSelect(c.cardNumber)">Select</a>
+                </div>
+            </div>
+        }
+        <a href="/addcreditcard" class="oi oi-plus"></a>
+    }
+    else
+    {
+        <h4>No cards found...</h4>
+        <p />
+        <h5 href="/addcreditcard">Add Card</h5>
+    }
+
+</div>
+
+
+
+@code {
+    List<CreditCard> cards = new List<CreditCard>();
+    int userId;
+    int productId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        userId = await sessionStorage.GetItemAsync<int>("user");
+        cards = await cardService.usersCard(userId);
+    }
+
+    //Method to create order
+    protected async Task cardSelect(long cardNumber)
+    {
+        userId = await sessionStorage.GetItemAsync<int>("user");
+        productId = await sessionStorage.GetItemAsync<int>("itemSelected");
+        await orderService.CreateOrder(userId, productId, cardNumber);
+        nav.NavigateTo("/orderview");
+    }
+
+    //protected async Task setSession()
+    //{
+    //    userId = await sessionStorage.GetItemAsync<int>("user");
+    //    await sessionStorage.SetItemAsync("customer", userId);
+    //}
+}

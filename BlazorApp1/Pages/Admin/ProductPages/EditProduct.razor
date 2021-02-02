@@ -1,0 +1,27 @@
+﻿@page "/admin/editproduct"
+@using BlazorApp1.Data
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject IProductService productService 
+@inject NavigationManager nav 
+@inject IJSRuntime js
+ 
+<h3>Edit Product</h3>
+<ProductForm OnValidSubmit="@EditedProduct" ButtonText="Edit" p="p"/>
+
+
+@code {
+    Product p = new Product();
+
+    protected override async Task OnInitializedAsync()
+    {
+        p = await sessionStorage.GetItemAsync<Product>("passProdEdit");
+
+    }
+
+    protected async Task EditedProduct()
+    {
+        await productService.EditProduct(p);
+        js.InvokeVoidAsync("alert", "Product Edited");
+        nav.NavigateTo("/admin");
+    }
+}
